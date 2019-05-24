@@ -10,20 +10,22 @@ class JobBase
     protected $wwwroot;
     protected $branch;
 
-    public function __construct()
+    public function __construct($branch, $wwwroot)
     {
-        
-    }
-
-    public function execJob()
-    {
-        if (empty($this->wwwroot)) {
-            throw new JobException('wwwroot未定义');
-        }
+        $this->branch = trim($branch);
+        $this->wwwroot = trim($wwwroot);
 
         if (empty($this->branch)) {
             throw new JobException('branch未定义');
         }
+
+        if (empty($this->wwwroot)) {
+            throw new JobException('wwwroot未定义');
+        }
+    }
+
+    public function execJob()
+    {
 
         if (!file_exists($this->wwwroot)) {
             throw new JobException('wwwroot目录不存在');

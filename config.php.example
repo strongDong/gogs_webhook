@@ -1,0 +1,17 @@
+<?php
+
+//秘钥（项目添加webhook时填写的秘钥文本，添加webhook必须是gogs类型）
+define('SECRET', '');
+
+//合法IP（不添加则不验证）
+$ip_arr = array('');
+
+/* * ****************************repository config start *************************************** */
+//只对下边列出的git版本库以及指定分支生效
+//格式: '版本库地址' => array('branch'=>'分支名称','wwwroot'=>'部署路径')（版本库地址填写 ssh_url）
+$job_repository = array(
+    'git@github.com:strongDong/gogs_webhook.git' => array(
+        'branch' => 'master', //需要更新的分支，必填
+        'wwwroot' => '/opt/gogs_webhook'    //部署路径，必填
+    ),
+);

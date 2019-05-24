@@ -1,7 +1,9 @@
 <?php
 
+//debug
 error_reporting(0);
 ini_set('display_errors', 0);
+
 set_time_limit(0);
 ini_set('memory_limit', '512M');
 
@@ -15,16 +17,13 @@ require_once ROOT_DIR . '/lib/Loader.php';
 spl_autoload_register('Loader::autoload');
 
 //加载Log
-include_once ROOT_DIR . '/lib/log.php';
+require_once ROOT_DIR . '/lib/log.php';
 $log_file = LOG_DIR . '/' . date('Y-m-d') . '.log';
 $log_handler = new CLogFileHandler($log_file);
 $Log = Log::init($log_handler);
 
 //加载job_repository配置
-require_once ROOT_DIR . '/job_config.php';
+require_once ROOT_DIR . '/config.php';
 
-//秘钥（项目添加webhook时填写的秘钥文本，添加webhook必须是gogs类型）
-define('SECRET', '');
-
-//合法IP（不添加则不验证）
-$ip_arr = array('');
+//加载共同方法
+require_once ROOT_DIR . '/lib/common.php';

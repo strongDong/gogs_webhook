@@ -14,7 +14,7 @@ class Loader
     public static function autoload($class)
     {
         $file = self::findFile($class);
-        if (file_exists($file)) {
+        if (is_file($file)) {
             self::includeFile($file);
         }
     }
