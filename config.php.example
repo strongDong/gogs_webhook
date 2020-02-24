@@ -8,10 +8,11 @@ $ip_arr = array('');
 
 /* * ****************************repository config start *************************************** */
 //只对下边列出的git版本库以及指定分支生效
-//格式: '版本库地址' => array('branch'=>'分支名称','wwwroot'=>'部署路径')（版本库地址填写 ssh_url）
+//格式: array('ssh_url'=>'版本库地址','branch'=>'分支名称','wwwroot'=>'部署路径')（版本库地址填写 ssh_url）
 $job_repository = array(
-    'git@github.com:strongDong/gogs_webhook.git' => array(
+    array(
+        'ssh_url' => 'git@github.com:strongDong/gogs_webhook.git', //ssh版本库地址，必填
         'branch' => 'master', //需要更新的分支，必填
-        'wwwroot' => '/opt/gogs_webhook'    //部署路径，必填
+        'wwwroot' => '/opt/gogs_webhook', //部署路径，必填
     ),
 );
