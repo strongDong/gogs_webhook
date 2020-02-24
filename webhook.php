@@ -2,9 +2,9 @@
 
 require_once dirname(__FILE__) . '/_init.php';
 
-$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';  //IP
-$signature = isset($_SERVER['HTTP_X_GOGS_SIGNATURE']) ? $_SERVER['HTTP_X_GOGS_SIGNATURE'] : '';  //签名
-$event = isset($_SERVER['HTTP_X_GOGS_EVENT']) ? $_SERVER['HTTP_X_GOGS_EVENT'] : '';  //事件
+$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : ''; //IP
+$signature = isset($_SERVER['HTTP_X_GOGS_SIGNATURE']) ? $_SERVER['HTTP_X_GOGS_SIGNATURE'] : ''; //签名
+$event = isset($_SERVER['HTTP_X_GOGS_EVENT']) ? $_SERVER['HTTP_X_GOGS_EVENT'] : ''; //事件
 
 if (empty($ip) || empty($signature) || empty($event)) {
     echo 'error 403';
@@ -22,8 +22,8 @@ if (empty($data)) {
     exit();
 }
 
-$branch = @end(explode("/", $data['ref']));  //分支
-$repository_url = $data['repository']['ssh_url'];  //版本库地址(ssh_url)
+$branch = @end(explode("/", $data['ref'])); //分支
+$repository_url = $data['repository']['ssh_url']; //版本库地址(ssh_url)
 
 $Log::INFO('地址: ' . $repository_url . ', 分支: ' . $branch . ', 事件: ' . $event);
 $Log::INFO("RAW DATA: \r\n" . var_export($data, true));
@@ -46,22 +46,28 @@ if (strtolower($event) != 'push') {
 }
 
 $job_key = $repository_url . '=>' . $branch;
-if (!isset($job_repository[$repository_url]) || $job_repository[$repository_url]['branch'] != $branch) {
+$current_repository = array_filter($job_repository, function ($val) use ($repository_url, $branch) {
+    if ($val['ssh_url'] == $repository_url && $val['branch'] == $branch) {
+        return true;
+    }
+});
+if (count($current_repository) == 0) {
     $Log::ERROR($job_key . ' 任务不存在');
     exit();
 }
 
-$filename = toCamelCase($data['repository']['name']) . toCamelCase($job_repository[$repository_url]['branch']);
+$current_repository = current($current_repository);
+
+$filename = toCamelCase($data['repository']['name']) . toCamelCase($current_repository['branch']);
 $jobfile = JOB_DIR . '/' . $filename . '.php';
 if (!is_file($jobfile)) {
     $filename = 'JobBase';
 }
 
-
 $Log::INFO('执行开始');
 try {
     $nn = "\\webhook\\jobs\\" . $filename;
-    $Job = new $nn($job_repository[$repository_url]['branch'], $job_repository[$repository_url]['wwwroot']);
+    $Job = new $nn($current_repository['branch'], $current_repository['wwwroot']);
     $res = $Job->execJob();
     if (!empty($res)) {
         $res_info = "执行结果: \r\n" . implode("\r\n", $res);
